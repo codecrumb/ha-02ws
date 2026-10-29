@@ -1,6 +1,13 @@
 # RUNBOOK — ha-02ws
 
-## Current API: https://www.02ws.co.il/api/now/0/1/C/1
+## Current API: https://v2013.02ws.co.il/02wsjson.txt
+## Clothing API: https://v2013.02ws.co.il/coldmeter_service.php?lang=1&json=1&cloth_type=e
+## (Old API https://www.02ws.co.il/api/now/0/1/C/1 is dead — Cloudflare 302s it
+##  to a stale path. The site rebuilt as a React app; the above subdomain is
+##  what it actually fetches from. No auth/cookies needed. Verified 2026-10-29.)
+## Both endpoints return content-type text/plain or text/html, NOT
+## application/json — must call `resp.json(content_type=None)` in aiohttp or
+## it raises ContentTypeError.
 ## Backup branch: backup-main
 ## Domain: o2ws (internal), Display: 02WS Weather
 
@@ -25,12 +32,17 @@ ha-02ws/
     └── o2ws/                          # Integration directory (domain name)
         ├── __init__.py
         ├── manifest.json
-        ├── sensor.py
         ├── const.py
-        └── RUNBOOK.md
+        ├── sensor.py
+        └── binary_sensor.py
 ```
 
 ### Key Points
 - Domain is `o2ws` (not `02ws`) to comply with Python/HA naming rules
 - Display name remains "02WS Weather" for users
 - `hacs.json` must be at repository root, not in custom_components/
+- The init file MUST be named `__init__.py` (double underscore each side). It
+  was previously misnamed `_init__.py` (single leading underscore) — HA's
+  component loader needs the real dunder name to import the package at all,
+  so that typo alone likely broke the whole integration independent of the
+  API being dead. Fixed 2026-10-29.
