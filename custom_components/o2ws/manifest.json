@@ -1,8 +1,8 @@
 {
   "domain": "o2ws",
   "name": "02WS Weather",
-  "codeowners": ["@Hackerwithnotepad"],
-  "documentation": "https://github.com/Hackerwithnotepad/ha-02ws",
+  "codeowners": ["@codecrumb"],
+  "documentation": "https://github.com/codecrumb/ha-02ws",
   "iot_class": "cloud_polling",
   "version": "2.0.0",
   "requirements": [],
