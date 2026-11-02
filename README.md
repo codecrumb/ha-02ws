@@ -17,20 +17,13 @@ cookies, session, or special headers are needed; verified 2026-10-29.
 
 ## Installation via HACS
 
-1. Ensure the repository is public.
-2. Go to **HACS → Integrations → Custom repositories**
-3. Paste this repo URL and select **Integration**
-4. Search for **02WS Weather** and install
-5. Restart Home Assistant
-
-## Add to `configuration.yaml`
-
-```yaml
-sensor:
-  - platform: o2ws
-binary_sensor:
-  - platform: o2ws
-```
+1. Go to **HACS → Integrations → Custom repositories**
+2. Paste this repo URL and select **Integration**
+3. Search for **02WS Weather** and install
+4. Restart Home Assistant
+5. Go to **Settings → Devices & Services → Add Integration**, search for
+   **02WS Weather**, and confirm — no YAML, no config fields, nothing to
+   fill in (there's no API key or location to set; it's one fixed feed).
 
 ## Entities
 

@@ -1,0 +1,13 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "02WS Weather",
+        "description": "Pulls live Jerusalem weather, air quality and alerts from 02WS/JeruSky. Nothing to configure — just confirm to add it."
+      }
+    },
+    "abort": {
+      "already_configured": "02WS Weather is already configured."
+    }
+  }
+}

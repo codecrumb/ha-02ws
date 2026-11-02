@@ -73,6 +73,27 @@ Home Assistant as sensors + a binary sensor.
     server-side but no reason to hammer it more often.
 - 2026-10-29: Added MIT `LICENSE` (required for eventual HACS default-store
   submission; not needed for custom-repository installs).
+- 2026-11-02: Rewrote from the legacy YAML `async_setup_platform` pattern to
+  config entries, so install is "Add Integration" in the UI with no
+  `configuration.yaml` editing:
+  - `config_flow.py` — single confirm-only step (no fields to ask for:
+    no API key, no location). Uses `async_set_unique_id(DOMAIN)` +
+    `_abort_if_unique_id_configured()` to block a second instance.
+  - `coordinator.py` — `O2wsDataUpdateCoordinator(DataUpdateCoordinator)`,
+    one shared fetch of both endpoints per 5-minute interval instead of
+    `sensor.py` and `binary_sensor.py` each independently polling. Uses
+    `async_get_clientsession(hass)` instead of opening a new
+    `aiohttp.ClientSession` per fetch.
+  - `device.py` — shared `DeviceInfo` so all entities group under one
+    "02WS Weather" device in the UI.
+  - `__init__.py` now has `async_setup_entry`/`async_unload_entry` instead
+    of the no-op `async_setup`.
+  - `sensor.py`/`binary_sensor.py` switched to `async_setup_entry` +
+    `CoordinatorEntity` subclasses; field-mapping logic (`SENSOR_DEFINITIONS`,
+    alert detection/decoding) is unchanged from the YAML version.
+  - `manifest.json`: added `"config_flow": true`.
+  - Added `strings.json` + `translations/en.json` for the confirm step's
+    title/description text.
 
 ## Publishing to HACS
 
@@ -89,10 +110,14 @@ Two different things:
 
 ## State / next steps
 
-- Code rewritten and compiles clean (`python3 -m py_compile`), not yet
-  tested against a running HA instance (no local HA install in this repo).
-- Commits exist locally but are intentionally unpushed until testing is
-  done via custom-repository install — don't push without being asked.
+- Earlier (pre-config-entry) version was pushed and is live on
+  `origin/main`; user added GitHub topics (`home-assistant`, `hacs`,
+  `hacs-integration`, `home-assistant-integration`, `weather`, `jerusalem`)
+  and was about to test the custom-repository install in HA.
+- The 2026-11-02 config-entry rewrite above is done locally but **not yet
+  committed or pushed** — don't push without being asked, same as before.
+- Still not tested against a running HA instance (no local HA install in
+  this repo) — user will test via HACS custom repository.
 - If something's off after testing: re-check `sensor.py`/`binary_sensor.py`
   field paths against a fresh `curl https://v2013.02ws.co.il/02wsjson.txt`
   dump — the site is unversioned and fields could shift.
@@ -107,9 +132,15 @@ ha-02ws/
 ├── hacs.json                          # HACS config, must be at repo ROOT
 └── custom_components/
     └── o2ws/                          # integration dir == domain name
-        ├── __init__.py
+        ├── __init__.py                # async_setup_entry/async_unload_entry
         ├── manifest.json
         ├── const.py
+        ├── config_flow.py             # confirm-only setup step
+        ├── coordinator.py             # shared DataUpdateCoordinator
+        ├── device.py                  # shared DeviceInfo
         ├── sensor.py
-        └── binary_sensor.py
+        ├── binary_sensor.py
+        ├── strings.json
+        └── translations/
+            └── en.json
 ```
